@@ -360,7 +360,18 @@ func RedirectToMeWebsite(db *badger.DB, bdb *badger.DB) fiber.Handler {
 				// when we will be spliting the string with "|", we will have node,code,ip,date
 				go helper.PutBDB([]byte(code+"-|-"+cookieToken+"-|-"+msgTime), nil, nil, bdb)
 			}
-			return c.Redirect(val)
+      queryParams := c.Request().URI().QueryArgs()
+      queryString := ""
+      for key, values := range queryParams {
+          for _, value := range values {
+              queryString += key + "=" + value + "&"
+          }
+      }
+      queryString = strings.TrimSuffix(queryString, "&")
+      if(queryString == "") {
+        return c.Redirect(val)
+      }
+      return c.Redirect(val + "?" + queryString)
 		}
 		return c.JSON(fiber.Map{"error": "true", "message": helper.ID106})
 	}
