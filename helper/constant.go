@@ -1,7 +1,7 @@
 package helper
 
 const (
-  PORT            = 8080
+	PORT            = 8080 // Please set to 1 if in production.
 	Production      = 1 // Please set to 1 if in production.
 	Domain          = "http://localhost:8080/"
 	CookieName      = "lin.ks"
