@@ -87,11 +87,6 @@ func main() {
 
 	api := app.Group("/api")
 
-  log.Println("This is a log message")
-  log.Println(n)
-  log.Println(api)
-
-
 	// // IndexHandler
 	api.Get("/", handler.IndexHandler)
 

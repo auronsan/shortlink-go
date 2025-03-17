@@ -5,9 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
-  "log"
 
-	"shortlink/helper"
+  "shortlink/helper"
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/gofiber/fiber/v2"
@@ -18,9 +17,19 @@ func IndexHandler(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"node": helper.NodeID, "message": "Short URL Service Provider"})
 }
 
+func ValidateToken(c *fiber.Ctx) (bool, string)  {
+  token := helper.ParseToken(c.Get("Authorization"))
+  if(len(token) != len(helper.APIToken)) {
+    return false, helper.ID103
+  }
+  if(token != helper.APIToken) {
+    return false, "Invalid API Token"
+  }
+  return true, ""
+}
+
 func CreateHandler(n int, bdb *badger.DB, db *badger.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    log.Println("n value", n)
 		post := new(helper.CreateURL)
 		if err := c.BodyParser(&post); err != nil {
 			return c.Status(400).JSON(fiber.Map{"error": "true", "message": helper.ErrorPrint(err.Error(), helper.CO101)})
@@ -31,11 +40,15 @@ func CreateHandler(n int, bdb *badger.DB, db *badger.DB) fiber.Handler {
 		}
 		// Get the API Token from Authorization Bearer Header
 		token := helper.ParseToken(c.Get("Authorization"))
-
     // Basic Checking without Real time API Token checking
-		if len(token) != helper.APITokenLength {
-			return c.Status(400).JSON(fiber.Map{"error": "true", "message": helper.ErrorPrint(helper.ID103, helper.ID103)})
-		}
+    result, validate := ValidateToken(c)
+    if result == false {
+      return c.Status(400).JSON(fiber.Map{"error": "true", "message": validate})
+    }
+    // check if secret match
+    if token != helper.APIToken {
+      return c.Status(400).JSON(fiber.Map{"error": "true", "message": "Invalid API Token"})
+    }
 		msgTime := time.Now().Format("2006-01-02-15:04:05")
 		// Create MD5 Hash of URL
 		md5URL := helper.CreateMD5Hash(post.URL)
@@ -103,9 +116,10 @@ func FetchAllHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := helper.ParseToken(c.Get("Authorization"))
 		// Basic Checking without Real time API Token checking
-		if len(token) != helper.APITokenLength {
-			return c.Status(400).JSON(fiber.Map{"error": "true", "message": helper.ID103})
-		}
+		result, validate := ValidateToken(c)
+    if result == false {
+      return c.Status(400).JSON(fiber.Map{"error": "true", "message": validate})
+    }
 		skey := make([]string, 0)
 		bdb.View(func(txn *badger.Txn) error {
 			it := txn.NewIterator(badger.DefaultIteratorOptions)
@@ -142,9 +156,10 @@ func UpdateHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 		token := helper.ParseToken(c.Get("Authorization"))
 
 		// Basic Checking without Real time API Token checking
-		if len(token) != helper.APITokenLength {
-			return c.Status(400).JSON(fiber.Map{"error": "true", "message": helper.ErrorPrint(helper.ID103, helper.ID103)})
-		}
+		result, validate := ValidateToken(c)
+    if result == false {
+      return c.Status(400).JSON(fiber.Map{"error": "true", "message": validate})
+    }
 		md5URL := helper.CreateMD5Hash(post.OURL)
 		// Check if user already has the URL
 		oldVal, err := helper.FindBDB([]byte(token+"-"+md5URL), bdb)
@@ -186,11 +201,11 @@ func FetchSingleHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 		code := c.Params("code")
 		code = strings.Replace(code, "%7C", "|", -1)
 		if len(code) > helper.ShortIDToken {
-			token := helper.ParseToken(c.Get("Authorization"))
 			// Basic Checking without Real time API Token checking
-			if len(token) != helper.APITokenLength {
-				return c.Status(400).JSON(fiber.Map{"error": "true", "message": helper.ID103})
-			}
+			result, validate := ValidateToken(c)
+      if result == false {
+        return c.Status(400).JSON(fiber.Map{"error": "true", "message": validate})
+      }
 			val, err := helper.FindDB([]byte(code), db)
 			if err != nil {
 				return c.JSON(fiber.Map{"error": "true", "message": helper.ErrorPrint(err.Error(), helper.ID105)})
@@ -251,9 +266,10 @@ func DeleteHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 		token := helper.ParseToken(c.Get("Authorization"))
 
 		// Basic Checking without Real time API Token checking
-		if len(token) != helper.APITokenLength {
-			return c.Status(400).JSON(fiber.Map{"error": "true", "message": helper.ErrorPrint(helper.ID103, helper.ID103)})
-		}
+    result, validate := ValidateToken(c)
+    if result == false {
+      return c.Status(400).JSON(fiber.Map{"error": "true", "message": validate})
+    }
 		md5URL := helper.CreateMD5Hash(post.URL)
 		// Check if user already has the URL
 		_, err := helper.FindBDB([]byte(token+"-"+md5URL), bdb)

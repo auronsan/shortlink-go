@@ -43,7 +43,6 @@ NodeID          = "N1|" // Increase per node by value as "N2|", "N3|"... for mul
 DBFolder        = "./db/"
 AddFromToken    = 3 // firt N character to get from token and use it in ShortID
 ShortIDToken    = 7 // Further added from 1st N char of AddFromToken+NodeID: total=12
-APITokenLength  = 10
 APIToken        = yoursecret
 ```
 
