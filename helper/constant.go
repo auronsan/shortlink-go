@@ -9,7 +9,7 @@ const (
 	DBFolder        = "./db" // Without trailing slash at the end.
 	AddFromToken    = 3                                  // firt N character to get from token and use it in ShortID
 	ShortIDToken    = 7                                  // Further added from 1st N char of AddFromToken+NodeID: total=12
-  APIToken        = "yoursecret"
+  APIToken        = "yoursecret"                                  // Further added from 1st N char of AddFromToken+NodeID: total=12
 	BypassLockGuard = false // set to true if DB is read from multiple instance.
 	DB101           = "Failed to Load Read-Heavy database, Please try again!"
 	DB102           = "Failed to Load Write-Heavy database, Please try again!"

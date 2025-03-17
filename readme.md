@@ -74,6 +74,16 @@ Share your feature request via `issue` tracker.
 - Via Code Contribution (if any / new feature)
 - Star the repository and watch out for new updates and features.
 
+### enable daemon systemd
+- `go build`
+- `chmod +x shortlink`
+- add `shortlink.conf` 
+WorkingDirectory=/home/dev/shortlink-go
+ExecStart=/home/dev/shortlink-go/shortlink
+- `systemctl daemon-reload`
+- `systemctl start shortlink.conf`
+- `systemctl enable shortlink.conf`
+
 ### Following Use cases:
 
 - Self-Hosted URL tracking.
@@ -83,3 +93,5 @@ Share your feature request via `issue` tracker.
 ## License
 
 Distributed under the Apache License 2.0. See `LICENSE` for more information.
+
+
