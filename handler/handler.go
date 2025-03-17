@@ -361,12 +361,7 @@ func RedirectToMeWebsite(db *badger.DB, bdb *badger.DB) fiber.Handler {
 				go helper.PutBDB([]byte(code+"-|-"+cookieToken+"-|-"+msgTime), nil, nil, bdb)
 			}
       queryParams := c.Request().URI().QueryArgs()
-      queryString := ""
-      for key, values := range queryParams {
-          for _, value := range values {
-              queryString += key + "=" + value + "&"
-          }
-      }
+      queryString := string(queryParams.String())
       queryString = strings.TrimSuffix(queryString, "&")
       if(queryString == "") {
         return c.Redirect(val)
