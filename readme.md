@@ -32,7 +32,7 @@ Common Steps to Launch:
   go run main.go OR go build -ldflags "-s -w" main.go && ./main
   ```
 
-### Must Changeable Variables in `helper/constant.go`:
+### make `helper/constant.go` copy from `helper/constant.go.example`:
 
 ```
 PORT            = 8080
