@@ -320,8 +320,7 @@ func DeleteHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 
 func ShortlinkHandler(db *badger.DB, bdb *badger.DB) fiber.Handler {
   return func(c *fiber.Ctx) error {
-    page := c.Params("page")
-    val := "mindclass://" + page
+    val := "mindclass://page"
     queryParams := c.Request().URI().QueryArgs()
     queryString := string(queryParams.String())
     queryString = strings.TrimSuffix(queryString, "&")
