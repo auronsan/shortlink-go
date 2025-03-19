@@ -135,7 +135,7 @@ func main() {
 
 	api.Post("/delete", handler.DeleteHandler(bdb, db))
 
-  app.Get("/app", handler.Shortlink(db, bdb))
+  app.Get("/app", handler.ShortlinkHandler(db, bdb))
 	app.Get("/:code", handler.RedirectToMeWebsite(db, bdb))
 
 
