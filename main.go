@@ -135,7 +135,9 @@ func main() {
 
 	api.Post("/delete", handler.DeleteHandler(bdb, db))
 
+  app.Get("/app", handler.Shortlink(db, bdb))
 	app.Get("/:code", handler.RedirectToMeWebsite(db, bdb))
+
 
   addr := fmt.Sprintf(":%d", helper.PORT)
 	// run the server...
