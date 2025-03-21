@@ -5,7 +5,7 @@ const (
 	Production      = 1 // Please set to 1 if in production.
 	Domain          = "http://localhost:8080/"
 	CookieName      = "lin.ks"
-	NodeID          = "N1|"                              // Increase per node by value as "N2|", "N3|"... for multiple node
+	NodeID          = "N1@"                              // Increase per node by value as "N2@", "N3@"... for multiple node
 	DBFolder        = "./db" // Without trailing slash at the end.
 	AddFromToken    = 3                                  // firt N character to get from token and use it in ShortID
 	ShortIDToken    = 7                                  // Further added from 1st N char of AddFromToken+NodeID: total=12

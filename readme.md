@@ -39,7 +39,7 @@ PORT            = 8080
 Production      = 2 // Please set to 1 if in production.
 Domain          = "http://localhost:8080/"
 CookieName      = "local"
-NodeID          = "N1|" // Increase per node by value as "N2|", "N3|"... for multiple node
+NodeID          = "N1@" // Increase per node by value as "N2@", "N3@"... for multiple node
 DBFolder        = "./db/"
 AddFromToken    = 3 // firt N character to get from token and use it in ShortID
 ShortIDToken    = 7 // Further added from 1st N char of AddFromToken+NodeID: total=12
