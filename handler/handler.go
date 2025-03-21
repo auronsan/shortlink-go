@@ -36,7 +36,7 @@ func CreateHandler(n int, bdb *badger.DB, db *badger.DB) fiber.Handler {
 		}
 		// should do better URL validation here
 		if !helper.ValidateURL(post.URL) {
-			return c.Status(400).JSON(fiber.Map{"error": "true", "message": "Invalid URL | Minimum URL Length should be 5"})
+			return c.Status(400).JSON(fiber.Map{"error": "true", "message": "Invalid URL Minimum URL Length should be 5"})
 		}
 		// Get the API Token from Authorization Bearer Header
 		token := helper.ParseToken(c.Get("Authorization"))
@@ -199,7 +199,7 @@ func UpdateHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 func FetchSingleHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		code := c.Params("code")
-		code = strings.Replace(code, "%7C", "|", -1)
+		code = strings.Replace(code, "%40", "@", -1)
 		if len(code) > helper.ShortIDToken {
 			// Basic Checking without Real time API Token checking
 			result, validate := ValidateToken(c)
@@ -221,7 +221,7 @@ func FetchSingleHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 				for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 					item := it.Item()
 					k := item.Key()
-					split := strings.Split(string(k), "-|-")
+					split := strings.Split(string(k), "-@-")
 					if len(split) == 3 {
 						if _, present := traffic["total"]; !present {
 							traffic["total"] = 1
@@ -278,7 +278,7 @@ func DeleteHandler(bdb *badger.DB, db *badger.DB) fiber.Handler {
 		}
 		// check the shortID, avoid delete wrong link.
 		if len(post.ShortID) > helper.ShortIDToken {
-			code := strings.Replace(post.ShortID, "%7C", "|", -1)
+			code := strings.Replace(post.ShortID, "%40", "@", -1)
 			val, err := helper.FindDB([]byte(code), db)
 			if err != nil {
 				return c.JSON(fiber.Map{"error": "true", "message": helper.ErrorPrint(err.Error(), helper.ID107)})
@@ -336,7 +336,7 @@ func RedirectToMeWebsite(db *badger.DB, bdb *badger.DB) fiber.Handler {
 		msgTime := time.Now().Format("2006-01-02-15:04:05")
 		code := c.Params("code")
 		if len(code) > helper.ShortIDToken {
-			code = strings.Replace(code, "%7C", "|", -1)
+			code = strings.Replace(code, "%40", "@", -1)
 			val, err := helper.FindDB([]byte(code), db)
 			if err != nil {
 				return c.JSON(fiber.Map{"error": "true", "message": helper.ErrorPrint(err.Error(), helper.ID105)})
@@ -347,7 +347,7 @@ func RedirectToMeWebsite(db *badger.DB, bdb *badger.DB) fiber.Handler {
 			// Do Cookie Way + IP Way
 			getCookie := c.Cookies(helper.CookieName, "no")
 			if len(getCookie) > 2 {
-				checkIfExist := helper.CheckBDB([]byte(code+"-|-"+getCookie+"-|-"), bdb)
+				checkIfExist := helper.CheckBDB([]byte(code+"-@-"+getCookie+"-@-"), bdb)
 				if !checkIfExist {
 					guid := xid.New()
 					getCookie = guid.String()
@@ -359,7 +359,7 @@ func RedirectToMeWebsite(db *badger.DB, bdb *badger.DB) fiber.Handler {
 						SameSite: "strict",
 					})
 				}
-				go helper.PutBDB([]byte(code+"-|-"+getCookie+"-|-"+msgTime), nil, nil, bdb)
+				go helper.PutBDB([]byte(code+"-@-"+getCookie+"-@-"+msgTime), nil, nil, bdb)
 			} else {
 				guid := xid.New()
 				cookieToken := guid.String()
@@ -370,8 +370,8 @@ func RedirectToMeWebsite(db *badger.DB, bdb *badger.DB) fiber.Handler {
 					HTTPOnly: true,
 					SameSite: "strict",
 				})
-				// when we will be spliting the string with "|", we will have node,code,ip,date
-				go helper.PutBDB([]byte(code+"-|-"+cookieToken+"-|-"+msgTime), nil, nil, bdb)
+				// when we will be spliting the string with "@", we will have node,code,ip,date
+				go helper.PutBDB([]byte(code+"-@-"+cookieToken+"-@-"+msgTime), nil, nil, bdb)
 			}
       queryParams := c.Request().URI().QueryArgs()
       queryString := string(queryParams.String())
